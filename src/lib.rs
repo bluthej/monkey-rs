@@ -1,7 +1,5 @@
 #![allow(dead_code, clippy::upper_case_acronyms)]
 
-use std::{iter::Peekable, str::CharIndices};
-
 #[derive(Debug, PartialEq)]
 enum Token<'a> {
     ILLEGAL,
@@ -41,8 +39,8 @@ fn look_up_ident(input: &str) -> Token {
 
 struct Lexer<'a> {
     input: &'a str,
-    chars: Peekable<CharIndices<'a>>,
     position: usize,
+    read_position: usize,
 }
 
 impl Lexer<'_> {
@@ -67,49 +65,55 @@ impl Lexer<'_> {
     }
 
     fn read_char(&mut self) -> Option<char> {
-        self.chars.next().map(|(p, c)| {
-            self.position = p;
-            c
-        })
+        self.input[self.read_position..]
+            .char_indices()
+            .next()
+            .map(|(p, c)| {
+                self.position = self.read_position;
+                self.read_position += p + 1;
+                c
+            })
     }
 
     fn skip_whitespace(&mut self) {
-        let mut c = self.chars.peek().map(|(_, c)| c);
+        let mut chars = self.input[self.read_position..].chars();
+        let mut c = chars.next();
         while c.map_or(false, |c| c.is_whitespace()) {
             self.read_char();
-            c = self.chars.peek().map(|(_, c)| c);
+            c = chars.next();
         }
     }
 
     fn read_identifier(&mut self) -> &str {
         let start = self.position;
-        let mut c = self.chars.peek().map(|(_, c)| c);
+        let mut chars = self.input[self.read_position..].chars();
+        let mut c = chars.next();
         while c.map_or(false, |c| c.is_alphabetic()) {
             self.read_char();
-            c = self.chars.peek().map(|(_, c)| c);
+            c = chars.next();
         }
-        let end = self.position;
-        &self.input[start..=end]
+        let end = self.read_position;
+        &self.input[start..end]
     }
 
     fn read_number(&mut self) -> &str {
         let start = self.position;
-        let mut c = self.chars.peek().map(|(_, c)| c);
+        let mut chars = self.input[self.read_position..].chars();
+        let mut c = chars.next();
         while c.map_or(false, |c| c.is_ascii_digit()) {
             self.read_char();
-            c = self.chars.peek().map(|(_, c)| c);
+            c = chars.next();
         }
-        let end = self.position;
-        &self.input[start..=end]
+        let end = self.read_position;
+        &self.input[start..end]
     }
 }
 
 fn new(input: &str) -> Lexer<'_> {
-    let chars = input.char_indices().peekable();
     Lexer {
         input,
-        chars,
         position: 0,
+        read_position: 0,
     }
 }
 
