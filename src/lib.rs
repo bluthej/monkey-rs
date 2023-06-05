@@ -1,4 +1,4 @@
-#![allow(dead_code, clippy::upper_case_acronyms)]
+#![allow(dead_code, clippy::upper_case_acronyms, non_camel_case_types)]
 
 #[derive(Debug, PartialEq)]
 enum Token<'a> {
@@ -19,6 +19,9 @@ enum Token<'a> {
 
     LT,
     GT,
+
+    EQ,
+    NOT_EQ,
 
     // Delimiters
     COMMA,
@@ -67,10 +70,22 @@ impl Lexer<'_> {
             return EOF;
         };
         match c {
-            '=' => ASSIGN,
+            '=' => match self.peek_char() {
+                Some('=') => {
+                    self.read_char();
+                    EQ
+                }
+                _ => ASSIGN,
+            },
             '+' => PLUS,
             '-' => MINUS,
-            '!' => BANG,
+            '!' => match self.peek_char() {
+                Some('=') => {
+                    self.read_char();
+                    NOT_EQ
+                }
+                _ => BANG,
+            },
             '/' => SLASH,
             '*' => ASTERISK,
             '<' => LT,
@@ -96,6 +111,14 @@ impl Lexer<'_> {
                 self.read_position += p + 1;
                 c
             })
+    }
+
+    fn peek_char(&self) -> Option<char> {
+        self.input[self.read_position..]
+            .chars()
+            .peekable()
+            .peek()
+            .copied()
     }
 
     fn skip_whitespace(&mut self) {
@@ -252,6 +275,25 @@ if (5 < 10) {
             FALSE,
             SEMICOLON,
             RBRACE,
+        ];
+        test_tokens(input, expected_tokens);
+    }
+
+    #[test]
+    fn two_character_tokens() {
+        let input = "
+10 == 10;
+10 != 9;
+";
+        let expected_tokens = &[
+            INT(10),
+            EQ,
+            INT(10),
+            SEMICOLON,
+            INT(10),
+            NOT_EQ,
+            INT(9),
+            SEMICOLON,
         ];
         test_tokens(input, expected_tokens);
     }
