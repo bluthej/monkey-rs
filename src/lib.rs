@@ -144,28 +144,25 @@ fn new(input: &str) -> Lexer<'_> {
 mod tests {
     use super::*;
 
-    use std::error::Error;
-
-    type TestResult = Result<(), Box<dyn Error>>;
-
-    #[test]
-    fn basic_tokens() -> TestResult {
-        let input = "=+(){},;";
-        let expected_tokens = [
-            ASSIGN, PLUS, LPAREN, RPAREN, LBRACE, RBRACE, COMMA, SEMICOLON, EOF,
-        ];
-
+    fn test_tokens(input: &str, expected_tokens: &[Token]) {
         let mut l = new(input);
 
         for expected_token in expected_tokens {
-            assert_eq!(l.next_token(), expected_token);
+            assert_eq!(&l.next_token(), expected_token);
         }
-
-        Ok(())
     }
 
     #[test]
-    fn actual_source_code() -> TestResult {
+    fn basic_tokens() {
+        let input = "=+(){},;";
+        let expected_tokens = &[
+            ASSIGN, PLUS, LPAREN, RPAREN, LBRACE, RBRACE, COMMA, SEMICOLON, EOF,
+        ];
+        test_tokens(input, expected_tokens);
+    }
+
+    #[test]
+    fn actual_source_code() {
         let input = "let five = 5;
 let ten = 10;
 
@@ -174,7 +171,7 @@ let add = fn(x, y) {
 };
 
 let result = add(five, ten);";
-        let expected_tokens = [
+        let expected_tokens = &[
             LET,
             IDENT("five"),
             ASSIGN,
@@ -202,23 +199,16 @@ let result = add(five, ten);";
             RBRACE,
             SEMICOLON,
         ];
-
-        let mut l = new(input);
-
-        for expected_token in expected_tokens {
-            assert_eq!(l.next_token(), expected_token);
-        }
-
-        Ok(())
+        test_tokens(input, expected_tokens);
     }
 
     #[test]
-    fn additionnal_tokens() -> TestResult {
+    fn additionnal_tokens() {
         let input = "
 !-/*5;
 5 < 10 > 5;
         ";
-        let expected_tokens = [
+        let expected_tokens = &[
             BANG,
             MINUS,
             SLASH,
@@ -232,18 +222,11 @@ let result = add(five, ten);";
             INT(5),
             SEMICOLON,
         ];
-
-        let mut l = new(input);
-
-        for expected_token in expected_tokens {
-            assert_eq!(l.next_token(), expected_token);
-        }
-
-        Ok(())
+        test_tokens(input, expected_tokens);
     }
 
     #[test]
-    fn if_statement() -> TestResult {
+    fn if_statement() {
         let input = "
 if (5 < 10) {
     return true;
@@ -251,7 +234,7 @@ if (5 < 10) {
     return false;
 }
 ";
-        let expected_tokens = [
+        let expected_tokens = &[
             IF,
             LPAREN,
             INT(5),
@@ -270,13 +253,6 @@ if (5 < 10) {
             SEMICOLON,
             RBRACE,
         ];
-
-        let mut l = new(input);
-
-        for expected_token in expected_tokens {
-            assert_eq!(l.next_token(), expected_token);
-        }
-
-        Ok(())
+        test_tokens(input, expected_tokens);
     }
 }
