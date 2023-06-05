@@ -226,7 +226,7 @@ let result = add(five, ten);";
     }
 
     #[test]
-    fn if_statement() {
+    fn if_statement_and_return() {
         let input = "
 if (5 < 10) {
     return true;
