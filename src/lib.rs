@@ -12,6 +12,13 @@ enum Token<'a> {
     // Operator
     ASSIGN,
     PLUS,
+    MINUS,
+    BANG,
+    ASTERISK,
+    SLASH,
+
+    LT,
+    GT,
 
     // Delimiters
     COMMA,
@@ -25,6 +32,11 @@ enum Token<'a> {
     // Keywords
     FUNCTION,
     LET,
+    TRUE,
+    FALSE,
+    IF,
+    ELSE,
+    RETURN,
 }
 
 use Token::*;
@@ -33,6 +45,11 @@ fn look_up_ident(input: &str) -> Token {
     match input {
         "fn" => FUNCTION,
         "let" => LET,
+        "true" => TRUE,
+        "false" => FALSE,
+        "if" => IF,
+        "else" => ELSE,
+        "return" => RETURN,
         _ => IDENT(input),
     }
 }
@@ -51,11 +68,17 @@ impl Lexer<'_> {
         };
         match c {
             '=' => ASSIGN,
+            '+' => PLUS,
+            '-' => MINUS,
+            '!' => BANG,
+            '/' => SLASH,
+            '*' => ASTERISK,
+            '<' => LT,
+            '>' => GT,
             ';' => SEMICOLON,
+            ',' => COMMA,
             '(' => LPAREN,
             ')' => RPAREN,
-            ',' => COMMA,
-            '+' => PLUS,
             '{' => LBRACE,
             '}' => RBRACE,
             c if c.is_alphabetic() => look_up_ident(self.read_identifier()),
@@ -178,6 +201,74 @@ let result = add(five, ten);";
             SEMICOLON,
             RBRACE,
             SEMICOLON,
+        ];
+
+        let mut l = new(input);
+
+        for expected_token in expected_tokens {
+            assert_eq!(l.next_token(), expected_token);
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn additionnal_tokens() -> TestResult {
+        let input = "
+!-/*5;
+5 < 10 > 5;
+        ";
+        let expected_tokens = [
+            BANG,
+            MINUS,
+            SLASH,
+            ASTERISK,
+            INT(5),
+            SEMICOLON,
+            INT(5),
+            LT,
+            INT(10),
+            GT,
+            INT(5),
+            SEMICOLON,
+        ];
+
+        let mut l = new(input);
+
+        for expected_token in expected_tokens {
+            assert_eq!(l.next_token(), expected_token);
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn if_statement() -> TestResult {
+        let input = "
+if (5 < 10) {
+    return true;
+} else {
+    return false;
+}
+";
+        let expected_tokens = [
+            IF,
+            LPAREN,
+            INT(5),
+            LT,
+            INT(10),
+            RPAREN,
+            LBRACE,
+            RETURN,
+            TRUE,
+            SEMICOLON,
+            RBRACE,
+            ELSE,
+            LBRACE,
+            RETURN,
+            FALSE,
+            SEMICOLON,
+            RBRACE,
         ];
 
         let mut l = new(input);
