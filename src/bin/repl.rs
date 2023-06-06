@@ -3,7 +3,7 @@ use std::{
     io::{self, Write},
 };
 
-use monkey_rs::{new, Token::EOF};
+use monkey_rs::{new, Token};
 
 const PROMPT: &str = ">> ";
 
@@ -30,7 +30,7 @@ fn start() -> MyResult {
         io::stdin().read_line(&mut input)?;
         let mut l = new(&input);
         let mut token = l.next_token();
-        while token != EOF {
+        while token != Token::EOF {
             println!("{:?}", token);
             token = l.next_token();
         }
