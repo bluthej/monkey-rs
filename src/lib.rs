@@ -1,7 +1,7 @@
 #![allow(dead_code, clippy::upper_case_acronyms, non_camel_case_types)]
 
 #[derive(Debug, PartialEq)]
-enum Token<'a> {
+pub enum Token<'a> {
     ILLEGAL,
     EOF,
 
@@ -57,14 +57,14 @@ fn look_up_ident(input: &str) -> Token {
     }
 }
 
-struct Lexer<'a> {
+pub struct Lexer<'a> {
     input: &'a str,
     position: usize,
     read_position: usize,
 }
 
 impl Lexer<'_> {
-    fn next_token(&mut self) -> Token {
+    pub fn next_token(&mut self) -> Token {
         self.skip_whitespace();
         let Some(c) = self.read_char() else {
             return EOF;
@@ -155,7 +155,7 @@ impl Lexer<'_> {
     }
 }
 
-fn new(input: &str) -> Lexer<'_> {
+pub fn new(input: &str) -> Lexer<'_> {
     Lexer {
         input,
         position: 0,
