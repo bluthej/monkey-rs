@@ -1,4 +1,4 @@
-#![allow(dead_code, clippy::upper_case_acronyms, non_camel_case_types)]
+#![allow(clippy::upper_case_acronyms, non_camel_case_types)]
 
 #[derive(Debug, PartialEq)]
 pub enum Token<'a> {

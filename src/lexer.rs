@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use crate::token::{look_up_ident, Token, Token::*};
 
 pub struct Lexer<'a> {
