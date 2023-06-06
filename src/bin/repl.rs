@@ -3,7 +3,7 @@ use std::{
     io::{self, Write},
 };
 
-use monkey_rs::{new, Token};
+use monkey_rs::{Lexer, Token};
 
 const PROMPT: &str = ">> ";
 
@@ -28,7 +28,7 @@ fn start() -> MyResult {
         io::stdout().flush()?;
 
         io::stdin().read_line(&mut input)?;
-        let mut l = new(&input);
+        let mut l = Lexer::new(&input);
         let mut token = l.next_token();
         while token != Token::EOF {
             println!("{:?}", token);

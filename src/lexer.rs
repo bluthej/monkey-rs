@@ -7,6 +7,14 @@ pub struct Lexer<'a> {
 }
 
 impl Lexer<'_> {
+    pub fn new(input: &str) -> Lexer<'_> {
+        Lexer {
+            input,
+            position: 0,
+            read_position: 0,
+        }
+    }
+
     pub fn next_token(&mut self) -> Token {
         self.skip_whitespace();
         let Some(c) = self.read_char() else {
@@ -98,20 +106,12 @@ impl Lexer<'_> {
     }
 }
 
-pub fn new(input: &str) -> Lexer<'_> {
-    Lexer {
-        input,
-        position: 0,
-        read_position: 0,
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
     fn test_tokens(input: &str, expected_tokens: &[Token]) {
-        let mut l = new(input);
+        let mut l = Lexer::new(input);
 
         for expected_token in expected_tokens {
             assert_eq!(&l.next_token(), expected_token);
