@@ -1,12 +1,30 @@
 use crate::token::{look_up_ident, Token, Token::*};
 
+pub trait Lex {
+    fn tokens(&self) -> Lexer;
+}
+
+impl<T: AsRef<str>> Lex for T {
+    fn tokens(&self) -> Lexer {
+        Lexer::new(self.as_ref())
+    }
+}
+
 pub struct Lexer<'a> {
     input: &'a str,
     position: usize,
     read_position: usize,
 }
 
-impl Lexer<'_> {
+impl<'a> Iterator for Lexer<'a> {
+    type Item = Token<'a>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.next_token()
+    }
+}
+
+impl<'a> Lexer<'a> {
     pub fn new(input: &str) -> Lexer<'_> {
         Lexer {
             input,
@@ -15,12 +33,9 @@ impl Lexer<'_> {
         }
     }
 
-    pub fn next_token(&mut self) -> Token {
+    fn next_token(&mut self) -> Option<Token<'a>> {
         self.skip_whitespace();
-        let Some(c) = self.read_char() else {
-        return EOF;
-    };
-        match c {
+        self.read_char().map(|c| match c {
             '=' => match self.peek_char() {
                 Some('=') => {
                     self.read_char();
@@ -50,7 +65,7 @@ impl Lexer<'_> {
             c if c.is_alphabetic() => look_up_ident(self.read_identifier()),
             c if c.is_ascii_digit() => INT(self.read_number().parse::<usize>().unwrap()),
             _ => ILLEGAL,
-        }
+        })
     }
 
     fn read_char(&mut self) -> Option<char> {
@@ -81,7 +96,7 @@ impl Lexer<'_> {
         }
     }
 
-    fn read_identifier(&mut self) -> &str {
+    fn read_identifier(&mut self) -> &'a str {
         let start = self.position;
         let mut chars = self.input[self.read_position..].chars();
         let mut c = chars.next();
@@ -111,18 +126,15 @@ mod tests {
     use super::*;
 
     fn test_tokens(input: &str, expected_tokens: &[Token]) {
-        let mut l = Lexer::new(input);
-
-        for expected_token in expected_tokens {
-            assert_eq!(&l.next_token(), expected_token);
-        }
+        let tokens: Vec<_> = input.tokens().collect();
+        assert_eq!(tokens, expected_tokens);
     }
 
     #[test]
     fn basic_tokens() {
         let input = "=+(){},;";
         let expected_tokens = &[
-            ASSIGN, PLUS, LPAREN, RPAREN, LBRACE, RBRACE, COMMA, SEMICOLON, EOF,
+            ASSIGN, PLUS, LPAREN, RPAREN, LBRACE, RBRACE, COMMA, SEMICOLON,
         ];
         test_tokens(input, expected_tokens);
     }
@@ -163,6 +175,16 @@ let result = add(five, ten);";
             IDENT("y"),
             SEMICOLON,
             RBRACE,
+            SEMICOLON,
+            LET,
+            IDENT("result"),
+            ASSIGN,
+            IDENT("add"),
+            LPAREN,
+            IDENT("five"),
+            COMMA,
+            IDENT("ten"),
+            RPAREN,
             SEMICOLON,
         ];
         test_tokens(input, expected_tokens);
