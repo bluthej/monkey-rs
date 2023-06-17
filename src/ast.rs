@@ -3,6 +3,9 @@ pub enum Statement<'a> {
         identifier: Identifier<'a>,
         value: Expression,
     },
+    ReturnStatement {
+        value: Expression,
+    },
 }
 
 pub struct Identifier<'a> {

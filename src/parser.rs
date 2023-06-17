@@ -33,6 +33,7 @@ impl<'a> Parser<'a> {
     fn parse_statement(&mut self) -> Option<Statement<'a>> {
         match self.l.next() {
             Some(Token::LET) => self.parse_let_statement(),
+            Some(Token::RETURN) => self.parse_return_statement(),
             _ => None,
         }
     }
@@ -72,6 +73,12 @@ impl<'a> Parser<'a> {
         );
         self.errors.push(msg);
     }
+
+    fn parse_return_statement(&mut self) -> Option<Statement<'a>> {
+        self.l.find(|token| token == &Token::SEMICOLON);
+        let value = Expression;
+        Some(Statement::ReturnStatement { value })
+    }
 }
 
 #[cfg(test)]
@@ -105,7 +112,9 @@ let foobar = 838383;
         {
             let Statement::LetStatement {
                 identifier: name, ..
-            } = statement;
+            } = statement else {
+                panic!("The input should only contain let statements");
+            };
             println!("{}", name.value);
             println!("{}", expected_identifier);
             assert_eq!(name.value, expected_identifier);
@@ -136,5 +145,32 @@ let 838383;
             eprintln!("{}", error);
         }
         panic!()
+    }
+
+    #[test]
+    fn return_statement() {
+        let input = "
+return 5;
+return 10;
+return 993322;
+";
+
+        let mut p = Parser::new(input.tokens());
+        let program = p.parse_program();
+
+        check_parser_errors(&p);
+
+        assert_eq!(
+            program.statements.len(),
+            3,
+            "program.statements does not contain 3 statements, got: {}",
+            program.statements.len()
+        );
+
+        for statement in program.statements {
+            if !matches!(statement, Statement::ReturnStatement { .. }) {
+                panic!("The input should only contain return statements");
+            }
+        }
     }
 }
