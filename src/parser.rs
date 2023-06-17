@@ -93,7 +93,12 @@ let foobar = 838383;
 
         check_parser_errors(&p);
 
-        assert_eq!(program.statements.len(), 3);
+        assert_eq!(
+            program.statements.len(),
+            3,
+            "program.statements does not contain 3 statements, got: {}",
+            program.statements.len()
+        );
 
         let expected_identifiers = ["x", "y", "foobar"];
         for (statement, expected_identifier) in program.statements.iter().zip(expected_identifiers)
