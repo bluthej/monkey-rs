@@ -1,58 +1,56 @@
-#![allow(clippy::upper_case_acronyms, non_camel_case_types)]
-
 #[derive(Debug, PartialEq)]
 pub enum Token<'a> {
-    ILLEGAL,
-    EOF,
+    Illegal,
+    EoF,
 
     // Identifiers + literals
-    IDENT(&'a str), // add, foobar, x, y, ...
-    INT(usize),     // 1343456
+    Ident(&'a str), // add, foobar, x, y, ...
+    Int(usize),     // 1343456
 
     // Operator
-    ASSIGN,
-    PLUS,
-    MINUS,
-    BANG,
-    ASTERISK,
-    SLASH,
+    Assign,
+    Plus,
+    Minus,
+    Bang,
+    Asterisk,
+    Slash,
 
     LT,
     GT,
 
-    EQ,
-    NOT_EQ,
+    Eq,
+    NotEq,
 
     // Delimiters
-    COMMA,
-    SEMICOLON,
+    Comma,
+    Semicolon,
 
-    LPAREN,
-    RPAREN,
-    LBRACE,
-    RBRACE,
+    LParen,
+    RParen,
+    LBrace,
+    RBrace,
 
     // Keywords
-    FUNCTION,
-    LET,
-    TRUE,
-    FALSE,
-    IF,
-    ELSE,
-    RETURN,
+    Function,
+    Let,
+    True,
+    False,
+    If,
+    Else,
+    Return,
 }
 
 use Token::*;
 
 pub fn look_up_ident(input: &str) -> Token {
     match input {
-        "fn" => FUNCTION,
-        "let" => LET,
-        "true" => TRUE,
-        "false" => FALSE,
-        "if" => IF,
-        "else" => ELSE,
-        "return" => RETURN,
-        _ => IDENT(input),
+        "fn" => Function,
+        "let" => Let,
+        "true" => True,
+        "false" => False,
+        "if" => If,
+        "else" => Else,
+        "return" => Return,
+        _ => Ident(input),
     }
 }

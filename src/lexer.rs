@@ -39,32 +39,32 @@ impl<'a> Lexer<'a> {
             '=' => match self.peek_char() {
                 Some('=') => {
                     self.read_char();
-                    EQ
+                    Eq
                 }
-                _ => ASSIGN,
+                _ => Assign,
             },
-            '+' => PLUS,
-            '-' => MINUS,
+            '+' => Plus,
+            '-' => Minus,
             '!' => match self.peek_char() {
                 Some('=') => {
                     self.read_char();
-                    NOT_EQ
+                    NotEq
                 }
-                _ => BANG,
+                _ => Bang,
             },
-            '/' => SLASH,
-            '*' => ASTERISK,
+            '/' => Slash,
+            '*' => Asterisk,
             '<' => LT,
             '>' => GT,
-            ';' => SEMICOLON,
-            ',' => COMMA,
-            '(' => LPAREN,
-            ')' => RPAREN,
-            '{' => LBRACE,
-            '}' => RBRACE,
+            ';' => Semicolon,
+            ',' => Comma,
+            '(' => LParen,
+            ')' => RParen,
+            '{' => LBrace,
+            '}' => RBrace,
             c if c.is_alphabetic() => look_up_ident(self.read_identifier()),
-            c if c.is_ascii_digit() => INT(self.read_number().parse::<usize>().unwrap()),
-            _ => ILLEGAL,
+            c if c.is_ascii_digit() => Int(self.read_number().parse::<usize>().unwrap()),
+            _ => Illegal,
         })
     }
 
@@ -134,7 +134,7 @@ mod tests {
     fn basic_tokens() {
         let input = "=+(){},;";
         let expected_tokens = &[
-            ASSIGN, PLUS, LPAREN, RPAREN, LBRACE, RBRACE, COMMA, SEMICOLON,
+            Assign, Plus, LParen, RParen, LBrace, RBrace, Comma, Semicolon,
         ];
         test_tokens(input, expected_tokens);
     }
@@ -150,42 +150,42 @@ let add = fn(x, y) {
 
 let result = add(five, ten);";
         let expected_tokens = &[
-            LET,
-            IDENT("five"),
-            ASSIGN,
-            INT(5),
-            SEMICOLON,
-            LET,
-            IDENT("ten"),
-            ASSIGN,
-            INT(10),
-            SEMICOLON,
-            LET,
-            IDENT("add"),
-            ASSIGN,
-            FUNCTION,
-            LPAREN,
-            IDENT("x"),
-            COMMA,
-            IDENT("y"),
-            RPAREN,
-            LBRACE,
-            IDENT("x"),
-            PLUS,
-            IDENT("y"),
-            SEMICOLON,
-            RBRACE,
-            SEMICOLON,
-            LET,
-            IDENT("result"),
-            ASSIGN,
-            IDENT("add"),
-            LPAREN,
-            IDENT("five"),
-            COMMA,
-            IDENT("ten"),
-            RPAREN,
-            SEMICOLON,
+            Let,
+            Ident("five"),
+            Assign,
+            Int(5),
+            Semicolon,
+            Let,
+            Ident("ten"),
+            Assign,
+            Int(10),
+            Semicolon,
+            Let,
+            Ident("add"),
+            Assign,
+            Function,
+            LParen,
+            Ident("x"),
+            Comma,
+            Ident("y"),
+            RParen,
+            LBrace,
+            Ident("x"),
+            Plus,
+            Ident("y"),
+            Semicolon,
+            RBrace,
+            Semicolon,
+            Let,
+            Ident("result"),
+            Assign,
+            Ident("add"),
+            LParen,
+            Ident("five"),
+            Comma,
+            Ident("ten"),
+            RParen,
+            Semicolon,
         ];
         test_tokens(input, expected_tokens);
     }
@@ -197,18 +197,18 @@ let result = add(five, ten);";
 5 < 10 > 5;
         ";
         let expected_tokens = &[
-            BANG,
-            MINUS,
-            SLASH,
-            ASTERISK,
-            INT(5),
-            SEMICOLON,
-            INT(5),
+            Bang,
+            Minus,
+            Slash,
+            Asterisk,
+            Int(5),
+            Semicolon,
+            Int(5),
             LT,
-            INT(10),
+            Int(10),
             GT,
-            INT(5),
-            SEMICOLON,
+            Int(5),
+            Semicolon,
         ];
         test_tokens(input, expected_tokens);
     }
@@ -223,23 +223,23 @@ if (5 < 10) {
 }
 ";
         let expected_tokens = &[
-            IF,
-            LPAREN,
-            INT(5),
+            If,
+            LParen,
+            Int(5),
             LT,
-            INT(10),
-            RPAREN,
-            LBRACE,
-            RETURN,
-            TRUE,
-            SEMICOLON,
-            RBRACE,
-            ELSE,
-            LBRACE,
-            RETURN,
-            FALSE,
-            SEMICOLON,
-            RBRACE,
+            Int(10),
+            RParen,
+            LBrace,
+            Return,
+            True,
+            Semicolon,
+            RBrace,
+            Else,
+            LBrace,
+            Return,
+            False,
+            Semicolon,
+            RBrace,
         ];
         test_tokens(input, expected_tokens);
     }
@@ -251,14 +251,14 @@ if (5 < 10) {
 10 != 9;
 ";
         let expected_tokens = &[
-            INT(10),
-            EQ,
-            INT(10),
-            SEMICOLON,
-            INT(10),
-            NOT_EQ,
-            INT(9),
-            SEMICOLON,
+            Int(10),
+            Eq,
+            Int(10),
+            Semicolon,
+            Int(10),
+            NotEq,
+            Int(9),
+            Semicolon,
         ];
         test_tokens(input, expected_tokens);
     }

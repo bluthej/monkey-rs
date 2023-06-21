@@ -32,23 +32,23 @@ impl<'a> Parser<'a> {
 
     fn parse_statement(&mut self) -> Option<Statement<'a>> {
         match self.l.next() {
-            Some(Token::LET) => self.parse_let_statement(),
-            Some(Token::RETURN) => self.parse_return_statement(),
+            Some(Token::Let) => self.parse_let_statement(),
+            Some(Token::Return) => self.parse_return_statement(),
             _ => None,
         }
     }
 
     fn parse_let_statement(&mut self) -> Option<Statement<'a>> {
-        if !self.expect_peek(&Token::IDENT("")) {
+        if !self.expect_peek(&Token::Ident("")) {
             return None;
         }
-        let Some(Token::IDENT(value)) = self.l.next() else {
+        let Some(Token::Ident(value)) = self.l.next() else {
             unreachable!("Peeked first");
         };
-        if !self.expect_peek(&Token::ASSIGN) {
+        if !self.expect_peek(&Token::Assign) {
             return None;
         }
-        self.l.find(|token| token == &Token::SEMICOLON);
+        self.l.find(|token| token == &Token::Semicolon);
         let identifier = Identifier { value };
         let value = Expression;
         Some(Statement::LetStatement { identifier, value })
@@ -75,7 +75,7 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_return_statement(&mut self) -> Option<Statement<'a>> {
-        self.l.find(|token| token == &Token::SEMICOLON);
+        self.l.find(|token| token == &Token::Semicolon);
         let value = Expression;
         Some(Statement::ReturnStatement { value })
     }
