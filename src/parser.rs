@@ -1,7 +1,7 @@
 #![allow(unused)]
 
 use crate::{
-    ast::{Expression, Identifier, Program, Statement},
+    ast::{Expression, Program, Statement},
     lexer::Lexer,
     token::Token,
 };
@@ -49,9 +49,9 @@ impl<'a> Parser<'a> {
             return None;
         }
         self.l.find(|token| token == &Token::Semicolon);
-        let identifier = Identifier { value };
+        let identifier = value;
         let value = Expression;
-        Some(Statement::LetStatement { identifier, value })
+        Some(Statement::Let { identifier, value })
     }
 
     fn expect_peek(&mut self, expected: &Token) -> bool {
@@ -77,7 +77,7 @@ impl<'a> Parser<'a> {
     fn parse_return_statement(&mut self) -> Option<Statement<'a>> {
         self.l.find(|token| token == &Token::Semicolon);
         let value = Expression;
-        Some(Statement::ReturnStatement { value })
+        Some(Statement::Return(value))
     }
 }
 
@@ -110,14 +110,14 @@ let foobar = 838383;
         let expected_identifiers = ["x", "y", "foobar"];
         for (statement, expected_identifier) in program.statements.iter().zip(expected_identifiers)
         {
-            let Statement::LetStatement {
+            let Statement::Let {
                 identifier: name, ..
             } = statement else {
                 panic!("The input should only contain let statements");
             };
-            println!("{}", name.value);
+            println!("{}", name);
             println!("{}", expected_identifier);
-            assert_eq!(name.value, expected_identifier);
+            assert_eq!(name, &expected_identifier);
         }
     }
 
@@ -168,7 +168,7 @@ return 993322;
         );
 
         for statement in program.statements {
-            if !matches!(statement, Statement::ReturnStatement { .. }) {
+            if !matches!(statement, Statement::Return(..)) {
                 panic!("The input should only contain return statements");
             }
         }

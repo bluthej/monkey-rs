@@ -1,15 +1,9 @@
 pub enum Statement<'a> {
-    LetStatement {
-        identifier: Identifier<'a>,
+    Let {
+        identifier: &'a str,
         value: Expression,
     },
-    ReturnStatement {
-        value: Expression,
-    },
-}
-
-pub struct Identifier<'a> {
-    pub value: &'a str,
+    Return(Expression),
 }
 
 pub struct Expression;
